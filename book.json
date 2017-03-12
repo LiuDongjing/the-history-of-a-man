@@ -1,0 +1,13 @@
+{
+"title": "一个人的历史",
+"author": "柳阳开", 
+"language": "chi",
+"description": "整理了自己的一些笔记",
+"gitbook": ">=3.0.0",
+"plugins": ["mathjax"],
+"pluginsConfig": {
+	"mathjax": {
+		"forceSVG": true
+		}
+	}
+}
