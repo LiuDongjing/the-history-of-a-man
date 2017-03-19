@@ -7,3 +7,6 @@
 		* [简介](机器学习/学习tensorflow.md#简介)
 		* [安装](机器学习/学习tensorflow.md#安装)
 		* [使用方法](机器学习/学习tensorflow.md#使用方法)
+* [其他](其他/README.md)
+	* [QT Installer Framework tutorial](其他/QT_IFW.md)
+	
