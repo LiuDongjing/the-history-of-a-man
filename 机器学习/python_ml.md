@@ -182,3 +182,124 @@ Regression的targets默认转换为_float64_类型，而classification的targets
 ```
 
 ### 查改增删
+#### selection and slicing
+DataFrame有三种基本的selection方法。
+
+- .loc，基于label的selection，比如使用列名，行索引
+- .iloc，基于位置的selection，序号从0开始
+- .ix，前两者的混合.
+    ```python
+    x.ix[0:2,'b':'c']
+    ```
+
+使用三者的基本格式是.fun[rowIndexer,colIndexer]，其中colIndex是可以省略的，表示选中
+所有列。而Indexer可以是多种类型的数据，如下。
+
+- 一个label或者一个整数，例如.loc['a']或.iloc[1]
+- label列表或者整数列表，例如.loc[['a','b']]或.iloc[[0,3]]
+- slice对象，比如.loc['a':'c']或者.iloc[0:3]。**注意** 前者返回的结果是包含
+    'c'索引的行，而后者返回的数据不包含位置为3的行
+- boolean数组，和Matlab类似。
+    ```python
+        df[df['A'] > 0]
+    ```
+- 一个函数，传入DataFrame，返回一个有效的Indexer。
+    ```python
+        df1.loc[lambda df: df.A > 0, :]
+    ```
+
+还有一种直接用df[]进行selection的方法需要特别说明。使用方法和上面的有联系
+也有差别。Indexer的格式和可以接受的类型和上面的一致，但不接受两个Indexer，
+也就是df[rowIndexer,colIndexer]是错误的用法。
+
+- df['a']，**特殊情况** 返回的是label为'a'的那一列，后面的操作都是针对行的
+- df['a':'c']，返回的是'a'到'c'行，并非对列进行slicing
+- df[0:3]，返回0-2行
+- df[lambda x:x['a'] > 1]，返回'a'列大于1的所有行
+
+最后说一种非常直观的一种selection方法，列名作为对象的属性来操作，比如df.a = 1，
+a是列名'a'，也就是将'a'全部置为1。这种方法在用boolean进行索引的时候就很方便,
+比如：
+
+```python
+    x[(x.a > 0) & (x.c < 3)]
+```
+
+**注意** 上面的selection和slicing方法都是可以在右边直接赋值的，比下面讲到的其他操作方法
+要方便很多。
+
+#### 添加、删除、更改
+添加新行用[append](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html#pandas.DataFrame.append)
+```python
+    days = days.append(tmp, ignore_index=True)
+```
+
+添加新列用[insert](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.insert.html#pandas.DataFrame.insert)，
+也可以直接用df['new_columns'] = value的方法，这样默认会在最后一列后面添加新列。insert方法可以
+指定新列添加的位置。
+```python
+    temp.insert(n+1, 'day%d'%(n+1), t)
+```
+
+**注意** append方法默认情况并不会更改原始数据，这是pandas大多数API的做法，但insert是个特例，
+直接在原始数据上操作。
+
+删除行或列用[drop](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html#pandas.DataFrame.drop)，
+可以传入list删除多行或多列。删除列还有一种简单的方法，del y['b']，直接在从原始数据中把'b'
+列删除了，要比下面的方法好用。
+
+```python
+    #删除列名为'b'的列
+    t = y.drop('b',axis='columns')
+
+    #删除index为'a'的行
+    t = y.drop('a',axis='rows')
+```
+
+对DataFrame数据修改一般情况下用上面的selection和slicing方法然后赋值就可以了，如果需要有针对性
+地对某些列或者行修改，用apply函数。
+
+```python
+    # 对wh的'desc'列修改，该列的没个值传入lambda函数，然后用函数返回值
+    #代替原数据。不过返回的是原始数据的copy。
+    wh.loc[:, 'desc'] = wh.desc.apply(lambda s:'雨' in s)
+
+
+```
+#### SQL查找
+
+
+#### Returning a view versus a copy
+使用DataFrame时，有时会莫名抛出_SettingWithCopyWarning_异常，这个异常的意思是某一行代码
+可能给临时变量赋值了。下面详细讲一下关于这个问题的一些细节。
+
+两种赋值方式的区别。
+
+```python
+    #第一种
+    dfmi.loc[:, ('one', 'second')] = value
+    
+    #第二种，也称chained indexing
+    dfmi['one']['second'] = value
+```
+
+第一种可以正常赋值，第二种会抛出_SettingWithCopyWarning_异常。要知道为什么，看一下两者在
+底层实现上的区别。
+
+```python
+    #第一种的底层实现
+    dfmi.loc.__setitem__((slice(None), ('one', 'second')), value)
+
+    #第二种的底层实现
+    dfmi.__getitem__('one').__setitem__('second', value)
+```
+
+第一种通过行列索引直接定位到原始数据进行赋值，而第二种多了__getitem__操作，
+赋值是在__getitem__返回的DataFrame上操作的！而问题就出在__getitem__方法上，
+在pandas的实现上，该方法是返回原始数据的一个view还是一个临时copy是无法确定的，
+这取决于底层数据的内存布局。所以_SettingWithCopyWarning_就是pandas在提醒你，你
+有可能在给一个临时变量赋值(copy)，而这可能并不是你想要的结果。
+
+[官方文档](http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy)
+推荐使用第一种方法赋值，除了上面的考虑以外，还因为第一种方法的执行效率更高(第二种
+是串行操作)。
