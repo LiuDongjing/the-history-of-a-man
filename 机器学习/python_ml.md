@@ -93,8 +93,8 @@ False。scoring参数使用哪种指标来评价模型，可以传入sklearn内�
 
 #### class imbalance problem
 当训练数据集中正样本太少时，可采取一些数据处理方法。python中可使用[SMOTE](http://contrib.scikit-learn.org/imbalanced-learn/generated/imblearn.over_sampling.SMOTE.html)
-模块。安装SMOTE可用_conda install -c glemaitre imbalanced-learn_
-或者 _pip install -U imbalanced-learn_。使用方法参考下面的代码。
+模块。安装SMOTE可用*conda install -c glemaitre imbalanced-learn*
+或者 *pip install -U imbalanced-learn*。使用方法参考下面的代码。
 
 ```python
     from imblearn.over_sampling import SMOTE
@@ -104,29 +104,34 @@ False。scoring参数使用哪种指标来评价模型，可以传入sklearn内�
 ```
 
 #### 一些细节问题
-1. 在sklearn中，除非特别说明，传给模型的训练数据都会默认转换为_float64_类型。
-Regression的targets默认转换为_float64_类型，而classification的targets的对象类型
+1. 在sklearn中，除非特别说明，传给模型的训练数据都会默认转换为float64类型。
+Regression的targets默认转换为float64类型，而classification的targets的对象类型
 默认保持不变。
 2. 每次调用模型的fit函数，会自动清空之前训练好的参数。
 
 ## pandas
 处理数据的核心类是DataFrame，可以把它简单地看成一张二维数据表，有index(行索引)和columns
 (列索引)，大部分操作都是通过index和columns进行的。需要注意的一点是这里的index和columns
-除了数字以外，还可以是其他数据类型，和数据库中的表格一样，一般会给columns中的每一列取一个
+除了是数字以外，还可以是其他数据类型，和数据库中的表格一样，一般会给columns中的每一列取一个
 有意义的名字，便于后续的操作。
 
 **注意** 在有些操作中，如果两个表的除了index不一样，其他条件都满足，操作的结果可能和直观的
-预期不一样，比如讲某一列数据insert另一个DataFrame中，如果两者的index不一样，最终的DataFrame
+预期不一样，比如将某一列数据insert另一个DataFrame中，如果两者的index不一样，最终的DataFrame
 的index是只有后者的index，那么前者没有的index值对应的数据就会出现NaN。类似的操作还有矩阵的
-加减乘除操作。下面的代码说明了这种情况。
+加减乘除操作。针对这种情况，可调用DF的[reset_index](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.reset_index.html#pandas.DataFrame.reset_index)方法。
+下面的代码说明了这种情况。
 
 ```python
     x = pd.DataFrame({'val':[1,2,3,4]})
+    z = x.copy()
     y = pd.DataFrame({'new':[1,2,3,4]},index=[2,3,4,5])
     print(x)
     print(y)
     x.insert(0,'col',y)
     print(x)
+    #drop=True的意识是把原来的index丢弃，否则会将index作为单独的列加入最终数据里
+    z.insert(0,'col',y.reset_index(drop=True))
+    print(z)
 ```
 
 最后的输出结果如下
@@ -149,6 +154,12 @@ Regression的targets默认转换为_float64_类型，而classification的targets
 1  NaN    2
 2  1.0    3
 3  2.0    4
+
+   col  val
+0    1    1
+1    2    2
+2    3    3
+3    4    4
 ```
 
 ### 基本操作
@@ -209,7 +220,7 @@ DataFrame有三种基本的selection方法。
     ```
 
 还有一种直接用df[]进行selection的方法需要特别说明。使用方法和上面的有联系
-也有差别。Indexer的格式和可以接受的类型和上面的一致，但不接受两个Indexer，
+也有差别。Indexer的格式和可以接受的类型与上面的一致，但不接受两个Indexer，
 也就是df[rowIndexer,colIndexer]是错误的用法。
 
 - df['a']，**特殊情况** 返回的是label为'a'的那一列，后面的操作都是针对行的
@@ -242,7 +253,7 @@ a是列名'a'，也就是将'a'全部置为1。这种方法在用boolean进行�
 ```
 
 **注意** append方法默认情况并不会更改原始数据，这是pandas大多数API的做法，但insert是个特例，
-直接在原始数据上操作。
+直接在原始数据上操作。如果想在原数据上直接操作，有的函数提供了inplace参数，将该参数置为True即可。
 
 删除行或列用[drop](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html#pandas.DataFrame.drop)，
 可以传入list删除多行或多列。删除列还有一种简单的方法，del y['b']，直接在从原始数据中把'b'
@@ -257,20 +268,204 @@ a是列名'a'，也就是将'a'全部置为1。这种方法在用boolean进行�
 ```
 
 对DataFrame数据修改一般情况下用上面的selection和slicing方法然后赋值就可以了，如果需要有针对性
-地对某些列或者行修改，用apply函数。
+地对列或者行批量修改，用[apply](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.apply.html#pandas.DataFrame.apply)函数。
 
 ```python
-    # 对wh的'desc'列修改，该列的没个值传入lambda函数，然后用函数返回值
-    #代替原数据。不过返回的是原始数据的copy。
+    # 对wh的'desc'列修改，该列的每个值传入lambda函数，
+    #然后用函数返回值代替原数据。不过返回的是原始数据的copy。
     wh.loc[:, 'desc'] = wh.desc.apply(lambda s:'雨' in s)
 
+    #将原数据以行为单位传给lambda函数，用返回值代替原来的行，
+    #返回的是原数据的copy
+    x.apply(lambda x:x-1,axis='columns')
+
+    #将原数据以列为单位传给lambda函数，用返回值代替原来的列，
+    #返回的是原数据的copy
+    x.apply(lambda x:x+1,axis='rows')
+```
+#### 与SQL对比
+
+**select语句**
+
+```sql
+    select * from tips 
+    where time = 'Dinner' and tip > 5.0;
+```
+用pandas的语法操作就是
+
+```python
+    tips[(tips.time == 'Dinner') & (tips.tip > 5.0)]
+```
+
+也就是用布尔向量进行索引，而布尔向量之间又可以进行逻辑操作，从而有类似于sql语句查询的功能。
+sql的逻辑运算符和布尔向量逻辑运算符之间的对应关系如下：
+
+- and, &
+- or, |
+- not, ~
+
+**group by**
+```sql
+select sex, count(*)
+from tips
+group by sex;
+```
+
+对应的pandas语法是
+
+```python
+    tips.groupby('sex').size()
+```
+
+group by之后求平均值
+```sql
+select day, avg(tip), count(*)
+from tips
+group by day;
+```
+
+对应的pandas语法
+
+```python
+tips.groupby('day').agg({'tip':np.mean, 'day':np.size})
+```
+
+这里agg的作用就是传入自定义的聚合函数，传入一个dict对象，key是新的列名，
+而value即是聚合函数。
+
+也可以在多个列上执行groupby。
+
+```sql
+select smoker, day, count(*), avg(tip)
+from tips
+group by smoker, day;
+```
+
+对应的pandas语法
+
+```python
+tips.groupby(['smoker', 'day']).agg({'tip': 
+        [np.size, np.mean]})
+```
+
+**小技巧** groupby 返回的对象类型是DataFrameGroupBy，可调用它的[get_group](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.get_group.html#pandas.core.groupby.GroupBy.get_group )
+方法获取指定group的DataFrame，这种先groupby再单独处理每个group的方法，
+要比每次从原数据中select出要处理的数据高效很多。
+
+```python
+    x = dat.groupby('sid')
+    t = x.get_group('1892')
+```
+
+**join**
+
+这个只讲解pandas的部分更容易理解，pandas中使用DataFrame的[merge](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.merge.html#pandas.DataFrame.merge)方法实现两个表
+的join操作。该方法的基本用法如下：
+
+```python
+    #df1和df2内连接
+    df1.merge(df2,how='inner',on='key')
+```
+
+on参数指定在哪一列或哪几列上进行join操作，指定的列必须在两个DF中都存在。
+how参数指定连接的类型，可取四种值，默认是'inner'，有下面几个取值：
+
+- 'left'，只保留左边DF的keys
+- 'right'，只保留右边DF的keys
+- 'outer'，保留两者keys的并集
+- 'inner'，保留两者keys的交集
+
+下面用例子说明每种join方法的区别。
+
+```python
+df1 = pd.DataFrame({'key':[1,2,3,4],'value':
+        np.random.random_sample([4])})
+print('df1\n',df1)
+
+df2 = pd.DataFrame({'key':[1,3,4,5],'value':
+        np.random.random_sample([4])})
+print('df2\n',df2)
+
+print('df1 left df2\n', df1.merge(df2, how='left', on='key'))
+print('df1 right df2\n', df1.merge(df2, how='right', on='key'))
+print('df1 outer df2\n', df1.merge(df2, how='outer', on='key'))
+print('df1 inner df2\n', df1.merge(df2, how='inner', on='key'))
+```
+
+输出结果如下：
+```
+df1
+    key     value
+0    1  0.845405
+1    2  0.642107
+2    3  0.758456
+3    4  0.438835
+df2
+    key     value
+0    1  0.628594
+1    3  0.498112
+2    4  0.880403
+3    5  0.312065
+df1 left df2
+    key   value_x   value_y
+0    1  0.845405  0.628594
+1    2  0.642107       NaN
+2    3  0.758456  0.498112
+3    4  0.438835  0.880403
+df1 right df2
+    key   value_x   value_y
+0    1  0.845405  0.628594
+1    3  0.758456  0.498112
+2    4  0.438835  0.880403
+3    5       NaN  0.312065
+df1 outer df2
+    key   value_x   value_y
+0    1  0.845405  0.628594
+1    2  0.642107       NaN
+2    3  0.758456  0.498112
+3    4  0.438835  0.880403
+4    5       NaN  0.312065
+df1 inner df2
+    key   value_x   value_y
+0    1  0.845405  0.628594
+1    3  0.758456  0.498112
+2    4  0.438835  0.880403
+```
+
+**order by**
+
+使用DF的[sort_values](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.sort_values.html#pandas.DataFrame.sort_values)方法。
+
+```python
+    x = pd.DataFrame({'val':np.random.random_sample([4])})
+    print('x\n', x)
+
+    #按'val'列对行排序，也可以传入多个列的list
+    print('x.sort_values\n', x.sort_values('val', ascending=False))
+```
+
+输出结果
 
 ```
-#### SQL查找
+x
+         val
+0  0.621772
+1  0.983429
+2  0.153223
+3  0.314375
+x.sort_values
+         val
+1  0.983429
+0  0.621772
+3  0.314375
+2  0.153223
+```
 
+[官方教程](http://pandas.pydata.org/pandas-docs/stable/comparison_with_sql.html)上
+有把SQL与pandas进行详细对比的内容，建议看一下。
 
 #### Returning a view versus a copy
-使用DataFrame时，有时会莫名抛出_SettingWithCopyWarning_异常，这个异常的意思是某一行代码
+使用DataFrame时，有时会莫名抛出*SettingWithCopyWarning*异常，这个异常的意思是某一行代码
 可能给临时变量赋值了。下面详细讲一下关于这个问题的一些细节。
 
 两种赋值方式的区别。
@@ -283,7 +478,7 @@ a是列名'a'，也就是将'a'全部置为1。这种方法在用boolean进行�
     dfmi['one']['second'] = value
 ```
 
-第一种可以正常赋值，第二种会抛出_SettingWithCopyWarning_异常。要知道为什么，看一下两者在
+第一种可以正常赋值，第二种会抛出*SettingWithCopyWarning*异常。要知道为什么，看一下两者在
 底层实现上的区别。
 
 ```python
@@ -297,9 +492,21 @@ a是列名'a'，也就是将'a'全部置为1。这种方法在用boolean进行�
 第一种通过行列索引直接定位到原始数据进行赋值，而第二种多了__getitem__操作，
 赋值是在__getitem__返回的DataFrame上操作的！而问题就出在__getitem__方法上，
 在pandas的实现上，该方法是返回原始数据的一个view还是一个临时copy是无法确定的，
-这取决于底层数据的内存布局。所以_SettingWithCopyWarning_就是pandas在提醒你，你
+这取决于底层数据的内存布局。所以*SettingWithCopyWarning*就是pandas在提醒你，你
 有可能在给一个临时变量赋值(copy)，而这可能并不是你想要的结果。
 
 [官方文档](http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy)
 推荐使用第一种方法赋值，除了上面的考虑以外，还因为第一种方法的执行效率更高(第二种
 是串行操作)。
+
+### 小技巧
+1. 去除重复数据用[drop_duplicates](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop_duplicates.html#pandas.DataFrame.drop_duplicates)，
+    比如*t.drop_duplicates(inplace=True)*
+2. 缺失数据处理用[replace](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.replace.html#pandas.DataFrame.replace)、[fillna](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.fillna.html#pandas.DataFrame.fillna)或者[dropna](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.dropna.html#pandas.DataFrame.dropna)，
+    比如*t.replace('null',-1,inplace=True)*
+3. 重命令列名[rename_axis](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.rename_axis.html#pandas.DataFrame.rename_axis)，
+    比如*res = res.rename_axis({0: "user_id", 1: "item_id"}, axis="columns")*，
+    可以只更改部分列，未指定的部分保持不变。还可以使用[rename](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.rename.html#pandas.DataFrame.rename)函数，
+    或者直接对columns属性进行修改，比如
+    *off_train.columns = ['user_id','merchant_id','coupon_id','discount_rate','distance','date_received','date']*，
+    依次指定每一列的新名字
