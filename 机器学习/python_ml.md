@@ -510,3 +510,18 @@ x.sort_values
     或者直接对columns属性进行修改，比如
     *off_train.columns = ['user_id','merchant_id','coupon_id','discount_rate','distance','date_received','date']*，
     依次指定每一列的新名字
+    
+### 补充
+按指定顺序重新给列排序：[reindex_aixs](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.reindex_axis.html#pandas.DataFrame.reindex_axis)
+
+```python
+x = pd.DataFrame({'id':[0,1], 'val':['a','b'], 't':[1.1,1.2]})
+print(x.reindex_axis(['val', 't', 'id'], axis='columns'))
+```
+
+```
+  val    t  id
+0   a  1.1   0
+1   b  1.2   1
+```
+
