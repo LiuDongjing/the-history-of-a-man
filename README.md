@@ -12,3 +12,4 @@
 <a href="https://github.com/liudongjing"><img src="images/github.png" height="30px" alt="liudongjing"/></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.zhihu.com/people/liu-yang-kai-18/" alt="柳阳开"><img src="images/知乎.jpg" height="30px"/></a>
 
 [badge-author]: https://img.shields.io/badge/Author-LiuDongjing-blue.svg
+[my-zhihu]: https://www.zhihu.com/people/liu-yang-kai-18/
