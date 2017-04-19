@@ -45,6 +45,10 @@ pickle包，因为前者在处理体量更大的数据时更加高效。
 - f1, [metrics.f1_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score)
 - logistic loss(也称cross-entropy loss), [metrics.log_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html#sklearn.metrics.log_loss)
 
+**注意** mean squared error的定义如下：
+
+![mse][mse_fmt]
+
 ### 交叉验证
 使用sklearn.model_selection包，使用方法也比较简单。
 
@@ -537,3 +541,5 @@ plt.show()
 
 
 [plot_api]: https://matplotlib.org/api/pyplot_summary.html
+[mse_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/67b9ac7353c6a2710e35180238efe54faf4d9c15
+
