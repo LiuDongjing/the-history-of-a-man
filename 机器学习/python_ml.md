@@ -525,3 +525,15 @@ print(x.reindex_axis(['val', 't', 'id'], axis='columns'))
 1   b  1.2   1
 ```
 
+绘制图像
+
+以直方图为例，更多的请参考[官方API文档][plot_api]
+```python
+import matplotlib.pyplot as plt
+d = np.abs((true - pred)).round()
+plt.hist(d, bins=100)
+plt.show()
+```
+
+
+[plot_api]: https://matplotlib.org/api/pyplot_summary.html
