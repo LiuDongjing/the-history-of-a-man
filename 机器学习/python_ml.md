@@ -40,14 +40,15 @@ pickle包，因为前者在处理体量更大的数据时更加高效。
 使用sklearn.metrics包，用法比较简单，具体的可参考官方文档。下面
 罗列了一些常见的metrics。
 
-- Mean squared error, [metrics.mean_squared_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error)
-- accuracy, [metrics.accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score)
+- Mean squared error, [metrics.mean_squared_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error)。定义如下:
+    
+    ![mse][mse_fmt]
+- accuracy, [metrics.accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score)。**注意仅**用于评估分类问题。定义如下：
+    
+    ![acc_fmt][acc_fmt]
 - f1, [metrics.f1_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score)
 - logistic loss(也称cross-entropy loss), [metrics.log_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html#sklearn.metrics.log_loss)
 
-**注意** mean squared error的定义如下：
-
-![mse][mse_fmt]
 
 ### 交叉验证
 使用sklearn.model_selection包，使用方法也比较简单。
@@ -542,4 +543,4 @@ plt.show()
 
 [plot_api]: https://matplotlib.org/api/pyplot_summary.html
 [mse_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/67b9ac7353c6a2710e35180238efe54faf4d9c15
-
+[acc_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/e2e427ec6dcf2d7882c3bbdc659a8204cba59dcc
