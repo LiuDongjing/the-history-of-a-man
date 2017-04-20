@@ -540,7 +540,13 @@ plt.hist(d, bins=100)
 plt.show()
 ```
 
+返回最大值的索引
+
+用np.argmax(data)，使用方法参考[argmax][argmax]
+
 
 [plot_api]: https://matplotlib.org/api/pyplot_summary.html
 [mse_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/67b9ac7353c6a2710e35180238efe54faf4d9c15
 [acc_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/e2e427ec6dcf2d7882c3bbdc659a8204cba59dcc
+[argmax]: https://docs.scipy.org/doc/numpy/reference/generated/numpy.argmax.html
+
