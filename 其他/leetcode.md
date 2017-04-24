@@ -92,3 +92,40 @@ public:
     }
 };
 ```
+
+## 376(Wiggle Subsequence)
+### 问题重述
+给一个序列，问满足下面条件的最长子序列(和上面的子字符串的定义一样，通过删除某些数字得到)的长度是多少？
+
+对子序列中的每个数字$$q_i$$，满足$$(q_i - q_{i-1})\time(q_{i+1} - q_i) < 0$$，也就是将序列画在坐标系上呈锯齿状。
+
+### 思路
+对于每一段连续上升(或下降)的子序列，中间的数字是不用包含在最终的子序列里面的，因为假设存在一个中间点的最长子序列，
+那么把这个点替换成某个端点仍然是最长子序列(如果这个点在波峰，就用连续段的最高点代替；如果在波谷，
+就用连续段的最低点代替)。那么只留连续段的端点，得到的就是最长子序列。
+
+### 代码
+```cpp
+class Solution {
+public:
+    int wiggleMaxLength(vector<int>& nums) {
+         if(nums.size() < 2) return nums.size();
+         if(nums.size() == 2) return 1+(nums[0] != nums[1]);
+         vector<int> tmp;
+         /*去除前后相等的元素，只保留一个。因为存在连续相等的子序列刚好在波峰或波谷
+         的情况，如果不去除，用前面的左右导数相乘的方法就检测不出来*/
+         tmp.push_back(nums[0]);
+         for(int i = 1;i < nums.size();i++)
+            if(nums[i] != nums[i-1]) tmp.push_back(nums[i]);
+         if(tmp.size() < 3) return tmp.size();
+         int cnt = 0;
+         for(int i = 1; i < tmp.size()-1;i++) {
+             int dl = tmp[i] - tmp[i-1];
+             int dr = tmp[i+1] - tmp[i];
+             if(dl*dr < 0) cnt++;
+         }
+         if(cnt == 0) return 1+(tmp.front() != tmp.back());
+         return cnt+2;
+    }
+};
+```
