@@ -335,7 +335,7 @@ group by day;
 tips.groupby('day').agg({'tip':np.mean, 'day':np.size})
 ```
 
-这里agg的作用就是传入自定义的聚合函数，传入一个dict对象，key是新的列名，
+这里agg的作用就是传入自定义的聚合函数，传入一个dict对象，key是聚合函数操作的列名(必须存在)，
 而value即是聚合函数。
 
 也可以在多个列上执行groupby。
@@ -352,6 +352,14 @@ group by smoker, day;
 tips.groupby(['smoker', 'day']).agg({'tip': 
         [np.size, np.mean]})
 ```
+
+**注意** 可以在同一个列上定义多个聚合函数(如上面的例子所示，对这个列传入一个聚合函数列表，不能使用多个列名相同而函数不相同的方法，否则返回的只是最后一个聚合函数的结果)。这种方法返回的DataFrame是多级索引的，继续操作不方便，可以用下面的方法转换一下(也就是直接对列名重新赋值)
+
+```python
+gp.columns = ['tollgate_id', 'direction', 'tmp_time', 
+                  'max_vol', 'min_vol', 'avg_vol']
+```
+
 
 **小技巧** groupby 返回的对象类型是DataFrameGroupBy，可调用它的[get_group](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.get_group.html#pandas.core.groupby.GroupBy.get_group )
 方法获取指定group的DataFrame，这种先groupby再单独处理每个group的方法，
