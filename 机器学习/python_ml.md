@@ -40,10 +40,15 @@ pickle包，因为前者在处理体量更大的数据时更加高效。
 使用sklearn.metrics包，用法比较简单，具体的可参考官方文档。下面
 罗列了一些常见的metrics。
 
-- Mean squared error, [metrics.mean_squared_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error)
-- accuracy, [metrics.accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score)
+- Mean squared error, [metrics.mean_squared_error](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html#sklearn.metrics.mean_squared_error)。定义如下:
+    
+    ![mse][mse_fmt]
+- accuracy, [metrics.accuracy_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score)。**注意仅**用于评估分类问题。定义如下：
+    
+    ![acc_fmt][acc_fmt]
 - f1, [metrics.f1_score](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score)
 - logistic loss(也称cross-entropy loss), [metrics.log_loss](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html#sklearn.metrics.log_loss)
+
 
 ### 交叉验证
 使用sklearn.model_selection包，使用方法也比较简单。
@@ -330,7 +335,7 @@ group by day;
 tips.groupby('day').agg({'tip':np.mean, 'day':np.size})
 ```
 
-这里agg的作用就是传入自定义的聚合函数，传入一个dict对象，key是新的列名，
+这里agg的作用就是传入自定义的聚合函数，传入一个dict对象，key是聚合函数操作的列名(必须存在)，
 而value即是聚合函数。
 
 也可以在多个列上执行groupby。
@@ -347,6 +352,14 @@ group by smoker, day;
 tips.groupby(['smoker', 'day']).agg({'tip': 
         [np.size, np.mean]})
 ```
+
+**注意** 可以在同一个列上定义多个聚合函数(如上面的例子所示，对这个列传入一个聚合函数列表，不能使用多个列名相同而函数不相同的方法，否则返回的只是最后一个聚合函数的结果)。这种方法返回的DataFrame是多级索引的，继续操作不方便，可以用下面的方法转换一下(也就是直接对列名重新赋值)
+
+```python
+gp.columns = ['tollgate_id', 'direction', 'tmp_time', 
+                  'max_vol', 'min_vol', 'avg_vol']
+```
+
 
 **小技巧** groupby 返回的对象类型是DataFrameGroupBy，可调用它的[get_group](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.get_group.html#pandas.core.groupby.GroupBy.get_group )
 方法获取指定group的DataFrame，这种先groupby再单独处理每个group的方法，
@@ -510,3 +523,38 @@ x.sort_values
     或者直接对columns属性进行修改，比如
     *off_train.columns = ['user_id','merchant_id','coupon_id','discount_rate','distance','date_received','date']*，
     依次指定每一列的新名字
+    
+### 补充
+按指定顺序重新给列排序：[reindex_aixs](http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.reindex_axis.html#pandas.DataFrame.reindex_axis)
+
+```python
+x = pd.DataFrame({'id':[0,1], 'val':['a','b'], 't':[1.1,1.2]})
+print(x.reindex_axis(['val', 't', 'id'], axis='columns'))
+```
+
+```
+  val    t  id
+0   a  1.1   0
+1   b  1.2   1
+```
+
+绘制图像
+
+以直方图为例，更多的请参考[官方API文档][plot_api]
+```python
+import matplotlib.pyplot as plt
+d = np.abs((true - pred)).round()
+plt.hist(d, bins=100)
+plt.show()
+```
+
+返回最大值的索引
+
+用np.argmax(data)，使用方法参考[argmax][argmax]
+
+
+[plot_api]: https://matplotlib.org/api/pyplot_summary.html
+[mse_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/67b9ac7353c6a2710e35180238efe54faf4d9c15
+[acc_fmt]: https://wikimedia.org/api/rest_v1/media/math/render/svg/e2e427ec6dcf2d7882c3bbdc659a8204cba59dcc
+[argmax]: https://docs.scipy.org/doc/numpy/reference/generated/numpy.argmax.html
+
