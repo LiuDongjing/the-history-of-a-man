@@ -169,6 +169,38 @@ public:
 };
 ```
 
+## 55(Jump Game)
+### 问题重述
+有一个数组，每个元素是个非负数，表示从当前位置向前跳的最大距离，比如a\[3\]=2，
+就可以从位置3最远跳到位置5。任意给个这样的数组，问能否从位置0跳到最后一个位置。
+
+### 思路
+对于某一位置t，在t的左边可以跳至t且离t最近的位置为n，若还存在可以跳至t且在n左边的位置x，
+那么x一定可以跳至n，也就是说若存在从x跳至t的合格路径，那么也一定存在对应一条从n跳至t的路径。
+所以只需要取n即可。从最后的位置，用这种方式往前跳，如果能跳到0位置，说明可以，否则不可以。
+
+### 代码
+```cpp
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int lastj = nums.size() - 1;
+        while(lastj > 0) {
+            bool flag = true;
+            for(int j = lastj-1; j >= 0; j--){
+                if(lastj - j <= nums[j]) {
+                    lastj = j;
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag) break;
+        }
+        return lastj == 0;
+    }
+};
+```
+
 [0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
 [1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
 [2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
