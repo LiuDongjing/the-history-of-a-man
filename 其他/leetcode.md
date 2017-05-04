@@ -201,6 +201,45 @@ public:
 };
 ```
 
+## 402(Remove K Digits)
+### 问题重述
+给一个10进制的数字，移除其中的K位使得剩下的数字表示的数最小。
+
+### 思路
+也就是选其中的S-K位(S是原数字的位数)使得所表示的数字最小。从最高位开始选，在保证位数够
+的情况下，选择最小的数字，如果有多个最小的，选择最左边的。因为同样位数的数字，高位小的
+肯定最小。有多个数字可选的话，选最左边，使得剩余位的可选择性最大。
+
+### 代码
+```python
+class Solution {
+public:
+    string removeKdigits(string num, int k) {
+        int len = num.size() - k;
+        if(len == 0) return "0";
+        string res(len, '0');
+        int leftm = -1;
+        for(int i = 0; i < len; i++){
+            int es = k + i;
+            int minv = num[es];
+            int mini = es;
+            for(int j = es - 1; j > leftm; j--){
+                if(num[j] <= minv) {
+                    minv = num[j];
+                    mini = j;
+                }
+            }
+            leftm = mini;
+            res[i] = num[mini];
+        }
+        int s = 0;
+        while(res[s] == '0') s++;
+        if(s == res.size()) return "0";
+        return res.substr(s);
+    }
+};
+```
+
 [0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
 [1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
 [2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
