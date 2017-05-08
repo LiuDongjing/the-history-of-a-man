@@ -240,6 +240,50 @@ public:
 };
 ```
 
+## 134(Gas Station)
+### 问题重述
+在一条环形的路上有N个加油站，每个加油站的储油量为gas[i]，并且从i号加油站到(i+1)%N号加油站耗油量为
+cost[i]。假设你开着一辆油箱容量无限(最开始油量为0)的汽车从某个加油站出发。给定gas和cost两个加油站配置数组，
+问从哪号加油站出发可保证汽车开一圈回到出发点(配置数组保证至多有一个这样的加油站，不存在返回-1)？
+
+### 思路
+基本思路很简单，就是一个个试，算法的复杂度为![O(n^2)][12]。不过超时了，后来这个基础上改进了。从i号加油站出发，
+当行驶的到j号加油站发现无法继续行驶时，那么[i,j]这个区间的加油站就不用测试了，一定也不能绕一圈回到出发点，因为
+从[i,j]中间任意一点出发到达j时，油箱的储油量一定不会大于从i出发到达j时的储油量。利用这个规律可以省掉很多不必要的测试点。
+此时算法的复杂度为O(n)。
+
+### 代码
+```cpp
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        vector<int> avl(gas.size());
+        for(int i = 0; i < avl.size(); i++)
+            avl[i] = gas[i] - cost[i];
+        int index = -1;
+        for(int i=0; i < avl.size(); ){
+            int sum = 0;
+            bool flag = true;
+            for(int j = 0; j < avl.size();j++) {
+                int ix = (i+j)%avl.size();
+                sum += avl[ix];
+                if(sum < 0) {
+                    flag = false;
+                    if(ix+1 <= i) i = avl.size();
+                    else i = ix+1;
+                    break;
+                }
+            }
+            if(flag){
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+};
+```
+
 [0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
 [1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
 [2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
@@ -252,3 +296,4 @@ public:
 [9]: https://chart.googleapis.com/chart?cht=tx&chl=r%20%3D%20%5C%7B%3Cx_1%2C%20c_1%3E%2C%20%3Cx_2%2C%20c_2%3E%2C%20...%2C%20%3Cx_n%2C%20c_n%3E%5C%7D
 [10]: images/435_NonOverlapping_greedy1.JPG
 [11]: https://chart.googleapis.com/chart?cht=tx&chl=O(2%5En)
+[12]: https://chart.googleapis.com/chart?cht=tx&chl=O(n%5E2)
