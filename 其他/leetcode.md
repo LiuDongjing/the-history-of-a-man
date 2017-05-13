@@ -169,6 +169,121 @@ public:
 };
 ```
 
+## 55(Jump Game)
+### 问题重述
+有一个数组，每个元素是个非负数，表示从当前位置向前跳的最大距离，比如a\[3\]=2，
+就可以从位置3最远跳到位置5。任意给个这样的数组，问能否从位置0跳到最后一个位置。
+
+### 思路
+对于某一位置t，在t的左边可以跳至t且离t最近的位置为n，若还存在可以跳至t且在n左边的位置x，
+那么x一定可以跳至n，也就是说若存在从x跳至t的合格路径，那么也一定存在对应一条从n跳至t的路径。
+所以只需要取n即可。从最后的位置，用这种方式往前跳，如果能跳到0位置，说明可以，否则不可以。
+
+### 代码
+```cpp
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int lastj = nums.size() - 1;
+        while(lastj > 0) {
+            bool flag = true;
+            for(int j = lastj-1; j >= 0; j--){
+                if(lastj - j <= nums[j]) {
+                    lastj = j;
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag) break;
+        }
+        return lastj == 0;
+    }
+};
+```
+
+## 402(Remove K Digits)
+### 问题重述
+给一个10进制的数字，移除其中的K位使得剩下的数字表示的数最小。
+
+### 思路
+也就是选其中的S-K位(S是原数字的位数)使得所表示的数字最小。从最高位开始选，在保证位数够
+的情况下，选择最小的数字，如果有多个最小的，选择最左边的。因为同样位数的数字，高位小的
+肯定最小。有多个数字可选的话，选最左边，使得剩余位的可选择性最大。
+
+### 代码
+```python
+class Solution {
+public:
+    string removeKdigits(string num, int k) {
+        int len = num.size() - k;
+        if(len == 0) return "0";
+        string res(len, '0');
+        int leftm = -1;
+        for(int i = 0; i < len; i++){
+            int es = k + i;
+            int minv = num[es];
+            int mini = es;
+            for(int j = es - 1; j > leftm; j--){
+                if(num[j] <= minv) {
+                    minv = num[j];
+                    mini = j;
+                }
+            }
+            leftm = mini;
+            res[i] = num[mini];
+        }
+        int s = 0;
+        while(res[s] == '0') s++;
+        if(s == res.size()) return "0";
+        return res.substr(s);
+    }
+};
+```
+
+## 134(Gas Station)
+### 问题重述
+在一条环形的路上有N个加油站，每个加油站的储油量为gas[i]，并且从i号加油站到(i+1)%N号加油站耗油量为
+cost[i]。假设你开着一辆油箱容量无限(最开始油量为0)的汽车从某个加油站出发。给定gas和cost两个加油站配置数组，
+问从哪号加油站出发可保证汽车开一圈回到出发点(配置数组保证至多有一个这样的加油站，不存在返回-1)？
+
+### 思路
+基本思路很简单，就是一个个试，算法的复杂度为![O(n^2)][12]。不过超时了，后来这个基础上改进了。从i号加油站出发，
+当行驶的到j号加油站发现无法继续行驶时，那么[i,j]这个区间的加油站就不用测试了，一定也不能绕一圈回到出发点，因为
+从[i,j]中间任意一点出发到达j时，油箱的储油量一定不会大于从i出发到达j时的储油量。利用这个规律可以省掉很多不必要的测试点。
+此时算法的复杂度为O(n)。
+
+### 代码
+```cpp
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        vector<int> avl(gas.size());
+        for(int i = 0; i < avl.size(); i++)
+            avl[i] = gas[i] - cost[i];
+        int index = -1;
+        for(int i=0; i < avl.size(); ){
+            int sum = 0;
+            bool flag = true;
+            for(int j = 0; j < avl.size();j++) {
+                int ix = (i+j)%avl.size();
+                sum += avl[ix];
+                if(sum < 0) {
+                    flag = false;
+                    if(ix+1 <= i) i = avl.size();
+                    else i = ix+1;
+                    break;
+                }
+            }
+            if(flag){
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+};
+```
+
 [0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
 [1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
 [2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
@@ -181,3 +296,4 @@ public:
 [9]: https://chart.googleapis.com/chart?cht=tx&chl=r%20%3D%20%5C%7B%3Cx_1%2C%20c_1%3E%2C%20%3Cx_2%2C%20c_2%3E%2C%20...%2C%20%3Cx_n%2C%20c_n%3E%5C%7D
 [10]: images/435_NonOverlapping_greedy1.JPG
 [11]: https://chart.googleapis.com/chart?cht=tx&chl=O(2%5En)
+[12]: https://chart.googleapis.com/chart?cht=tx&chl=O(n%5E2)
