@@ -5,7 +5,9 @@
 * [机器学习](机器学习/README.md)
   * [学习tensorflow](机器学习/学习tensorflow.md)
   * [python机器学习](机器学习/python_ml.md)
-  * [XGBoost基础](/机器学习/xgboost基础.md)
+  * [XGBoost基础](机器学习/xgboost基础.md)
+* [计科专业](计科专业/README.md)
+  * [python coding style][计科专业/python_style.md]
 * [随笔](随笔/README.md)
   * [乌镇旅游](随笔/乌镇.md)
   * [西溪湿地](随笔/西溪湿地.md)
