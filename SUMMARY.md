@@ -7,7 +7,7 @@
   * [python机器学习](机器学习/python_ml.md)
   * [XGBoost基础](机器学习/xgboost基础.md)
 * [计科专业](计科专业/README.md)
-  * [python coding style][计科专业/python_style.md]
+  * [python coding style](计科专业/python\_style.md)
 * [随笔](随笔/README.md)
   * [乌镇旅游](随笔/乌镇.md)
   * [西溪湿地](随笔/西溪湿地.md)
@@ -16,6 +16,4 @@
 * [其他](其他/README.md)
   * [QT Installer Framework tutorial](其他/QT_IFW.md)
   * [leetcode解题思路](其他/leetcode.md)
-
-
 
