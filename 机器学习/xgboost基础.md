@@ -43,5 +43,43 @@ l是有二阶导数的损失函数，并且二阶导数不能为0.正则化项�
 上面已经把模型和目标函数都定好了，现在来求解这个模型使得目标函数最小。
 
 ### 基本思路
-Gradient Tree Boosting在训练的时候是迭代进行的。
+Gradient Tree Boosting在训练的时候是迭代进行的，每次只添加一棵树。只要添加的这棵树使目标函数的增量最小即可。那么就有下面的公式：
+
+$$\mathcal{L}^{(t)} = \sum\limits_{i=1}^n l(y_i, \hat{y_i}^{(t-1)} + f_t(x_i)) + \Omega(f_t)$$
+
+t-1次迭代的预测结果$$\hat{y_i}^{(t-1)}$$加上本次添加树的预测结果$$f_t(x_i)$$就是t次迭代的预测结果。注意这里的$$\mathcal{L^{(t)}}$$和上面定义的目标函数$$\mathcal{L}(\phi)$$有细微的差别。在添加正则化项的时候，没有考虑前t-1次的$$\Omega$$。因为对我们的目标来讲，这些值都是常量，不受$$f_t$$选择的影响，所以当选择$$f_t$$使得$$\mathcal{L}^{(t)}$$最小时，对应的$$\mathcal{L}(\phi)$$也是最小的。
+
+### 近似
+简化后的目标函数仍然不好求解。考虑到泰勒(Taylor)公式：
+
+$$f(x + \Delta x) \simeq f(x) + f^{'}(x)\Delta x + \frac{1}{2}f^{''}(x)\Delta x^2$$
+
+将$$\mathcal{L}^{(t)}$$重写成：
+
+$$\mathcal{L}^{(t)} \simeq \sum\limits_{i=1}^n \left[ l(y_i, \hat y^{(t-1)}) + g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)\right] + \Omega(f_t)$$
+
+其中
+
+$$g_i = \partial_{\hat y^{(t-1)}} l(y_i, \hat y^{(t-1)})\\
+h_i = \partial^2_{\hat y^{(t-1)}} l(y_i, \hat y^{(t-1)})$$
+
+目标函数是关于预测值$$\hat y$$的函数，对比泰勒公式，上面的近似变换还是很容易理解的。
+
+移除常数项，可将目标函数进一步简化：
+
+$$\tilde{\mathcal{L}}^{(t)} = \sum\limits_{i=1}^n \left[ g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)\right] + \Omega(f_t)$$
+
+### 求解
+定义$$I_j = \left\{ i | q(x_i) = j\right\}$$，即所有映射到j号叶子节点的样本集合。引入$$I_j$$将上面的目标函数重写为如下形式：
+
+$$
+\begin{aligned}
+\tilde{\mathcal{L}}^{(t)} &= \sum\limits_{i=1}^n \left[ g_i f_t(x_i) + \frac{1}{2} h_i f^2_t(x_i)\right] + \gamma T + \frac{1}{2}\lambda\sum\limits_{j=1}^T w^2_j\\
+&= \sum\limits_{j=1}^T \left[ (\sum\limits_{i \in I_j} g_i)w_j +\frac{1}{2}(\sum\limits_{i \in I_j}h_i + \lambda)w_j^2\right] + \gamma T
+\end{aligned}
+$$
+
+其实也就是转换了看问题的角度，开始是从样本的角度来看目标函数，现在转换成从叶子节点的角度来看。就像求二维矩阵所有元素的和一样，先求每一行的和再把结果相加与先求列的和再相加是一样的。
+
+当q(x)固定，也就是树的结构固定，影响目标函数的只有叶子的权重w，
 
