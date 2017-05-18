@@ -109,7 +109,20 @@ $$\mathcal{L}_{split} = \frac{1}{2} \left[ \frac{(\sum_{i\in I_L} g_i)^2}{\sum_{
 
 这里就将损失函数和拆分操作联系起来了，当$$\mathcal{L}_{split}$$最大时，对该叶节点按选择的方式一分为二。
 
-### 算法1.0\(暴力枚举\)
+### 算法1.0(暴力枚举)
 
+**输入** I，当前节点的所有样本集合；D，特征的维度数
+$$gain \leftarrow 0$$
+$$G \leftarrow \sum_{i \in I}g_i, H \leftarrow \sum_{i \in I}h_i$$
+for k=1 to D do
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted(I, by $$x_{k}$$) do
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow G_L + g_j, H_L \leftarrow H_L + h_j\\
+G_R \leftarrow G - G_L, H_R \leftarrow H - H_L\\
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{G^2}{H + \lambda})
+$$
+&nbsp;&nbsp;&nbsp;&nbsp;end
+end
+**输出** 按照最大的score分割输出节点
 
-
+**Note**: 第一层循环遍历所有特征，第二层循环在该特征下找最佳分割点。重点解释一下第二层循环，首先将样本集I按第k个特征$$x_k$$(论文中是$$x_{jk}$$，疑有误)排序，然后按照这个顺序依次计算是否是最佳分割点。当处理到第j个样本时，前j(包括j)个样本分在左边的节点，之后的样本分在右边的节点。将算法中的公式和上面的$$\mathcal{L}_{split}$$的公式对应起来，就好理解了。
