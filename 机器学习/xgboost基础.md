@@ -145,4 +145,8 @@ end
 ### 算法3.0(Sparsity-aware Split)
 **输入** I, 当前节点的所有样本；D，特征的维度
 在使用算法2.0的设置时，只将非空的样本收入buckets。
-$$G \leftarrow \sum_{i \in I}g_i$$
+$$G \leftarrow \sum_{i \in I}g_i, H \leftarrow \sum_{i \in I}h_i$$
+for k = 1 to D do
+&nbsp;&nbsp;&nbsp;&nbsp;$$I_k = \left\{ i \in I | x_{ik} \ne missing\right\}$$
+&nbsp;&nbsp;&nbsp;&nbsp;//将有数据缺失的样本归入右边的节点
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$
