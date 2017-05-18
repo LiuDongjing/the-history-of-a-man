@@ -112,7 +112,6 @@ $$\mathcal{L}_{split} = \frac{1}{2} \left[ \frac{(\sum_{i\in I_L} g_i)^2}{\sum_{
 ### 算法1.0(暴力枚举)
 
 **输入** I，当前节点的所有样本集合；D，特征的维度数
-$$gain \leftarrow 0$$
 $$G \leftarrow \sum_{i \in I}g_i, H \leftarrow \sum_{i \in I}h_i$$
 for k=1 to D do
 &nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$
@@ -126,3 +125,24 @@ end
 **输出** 按照最大的score分割输出节点
 
 **Note**: 第一层循环遍历所有特征，第二层循环在该特征下找最佳分割点。重点解释一下第二层循环，首先将样本集I按第k个特征$$x_k$$(论文中是$$x_{jk}$$，疑有误)排序，然后按照这个顺序依次计算是否是最佳分割点。当处理到第j个样本时，前j(包括j)个样本分在左边的节点，之后的样本分在右边的节点。将算法中的公式和上面的$$\mathcal{L}_{split}$$的公式对应起来，就好理解了。
+
+### 算法2.0(近似分割)
+
+for k = 1 to D do
+&nbsp;&nbsp;&nbsp;&nbsp;针对特征k按照百分位数给出若干个分割点$$S_k = \left\{s_{k1}, s_{k2}, \cdots, s_{kl} \right\}$$
+&nbsp;&nbsp;&nbsp;&nbsp;这种预先计算分割点的方式可以是针对每棵树的(global)，也可以针对每个节点(local)。
+end
+
+for k = 1 to D do
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} g_j\\
+H_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} h_j$$
+end
+
+后续操作和算法1.0一样，不过只在预计算的分割点处分割。
+
+**Note**: 思路也是很简单的，在建树之前(global)之前会提前计算好分割点$$S_k$$，后面剖分节点时，不用一个一个尝试，只需要在$$S_k$$指定的地方分割就好。这样就简化了计算。local方式是指在分割某个节点前计算一个$$S_k$$，针对该节点下的样本集，而不是所有的样本集，这样比global方式又准确了一点，所以一般使用local方式。
+
+### 算法3.0(Sparsity-aware Split)
+**输入** I, 当前节点的所有样本；D，特征的维度
+在使用算法2.0的设置时，只将非空的样本收入buckets。
+$$G \leftarrow \sum_{i \in I}g_i$$
