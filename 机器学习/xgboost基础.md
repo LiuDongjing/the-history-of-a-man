@@ -187,3 +187,11 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 ### cache-aware
 获取g和h的时候，频繁使用间接索引，效率不高，在训练的时候，使用batch的方式一次获取后续的多个g和h值，分配一块缓冲区，计算累加结果存入缓冲区，仅接下来的若干次计算就可以直接从缓冲区中获得累加和。
 
+## 调参
+### 关键参数说明
+参考[官方文档][0]，着重讲讲下面的几个参数。
+- max_depth，树的最大深度。太小了难以捕捉到数据中的模式，太大了容易过拟合。
+- learning_rate，也就是上面的$$\eta$$
+- n_estimators，
+---
+[0]: http://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn
