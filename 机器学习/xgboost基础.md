@@ -150,3 +150,24 @@ for k = 1 to D do
 &nbsp;&nbsp;&nbsp;&nbsp;$$I_k = \left\{ i \in I | x_{ik} \ne missing\right\}$$
 &nbsp;&nbsp;&nbsp;&nbsp;//将有数据缺失的样本归入右边的节点
 &nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted($$I_k$$, **ascent** order by $$x_k$$) do
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow  G_L + g_i, H_L \leftarrow H_L + h_i\\
+G_R \leftarrow G - G_L, H_R \leftarrow H - H_L\\
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$
+&nbsp;&nbsp;&nbsp;&nbsp;end
+&nbsp;&nbsp;&nbsp;&nbsp;//将有数据缺失的样本归入左边的节点
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_R \leftarrow 0, H_R \leftarrow 0$$
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted($$I_k$$, **descent** order by $$x_k$$) do
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_R \leftarrow  G_R + g_i, H_R \leftarrow H_R + h_i\\
+G_L \leftarrow G - G_R, H_L \leftarrow H - H_R\\
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$
+&nbsp;&nbsp;&nbsp;&nbsp;end
+end
+**输出** score最大时对应的分割
+
+**Note**: 算法3.0主要是为了解决在实际应用中经常出现的数据缺失的问题，为此xgboost提出了**default direction**的概念，也就是当在某一特征上分割样本而一些样本缺失该特征的数据时，则会被归入一个默认的子节点(见下图)。默认方向是在训练过程中得到的。算法的整体思路也很直观，针对每个特征，都会测试将不完整样本归入左边和右边这两种情况。注意这里的$$I_k$$是这对第k个特征来讲的，也就是说只要样本的第k个特征不为空，那么就会包含到$$I_k$$里，而不管其他特征是否为空。另外这个算法可以和算法2.0整合，只需要注意预先计算的分割点也是在$$I_k$$上进行的。
+
+![default direction](images/default_direction.JPG)
+
+## 其他细节
+### Shrinkage和Column subsampling
