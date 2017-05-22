@@ -14,6 +14,7 @@
   * [西溪湿地](随笔/西溪湿地.md)
   * [嘉兴南湖](随笔/嘉兴南湖.md)
   * [17年春季毅行](随笔/17年春季毅行.md)
+  * [120年校庆](随笔/120校庆.md)
 * [其他](其他/README.md)
   * [QT Installer Framework tutorial](其他/QT_IFW.md)
   * [leetcode解题思路](其他/leetcode.md)
