@@ -199,8 +199,8 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 - colsample_bylevel，和上面的不同之处是每次分割前都会按这个比率抽取特征。通常情况下可以不用。
 - lambda, L2 regulation term on weights.用得也不多。
 - reg_alpha, L1 regulation term on weights.
-- min_child_weight(int)，Minimun sum of instance weight(hessain) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max_depth越大，这个参数也越大。
-- max_delta_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced.
+- min_child_weight(int)，Minimun sum of instance weight(hessain) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max_depth越大，这个参数也越大。在线性回归模型中，就对应着样本的数量。
+- max_delta_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced. 参考[官方文档][2]。
 
 
 
@@ -208,4 +208,5 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 [0]: http://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn
 [1]: https://www.kaggle.com/c/santander-customer-satisfaction/discussion/20662
 [2]: https://github.com/dmlc/xgboost/blob/master/doc/parameter.md
+[3]: https://arxiv.org/abs/1603.02754
 
