@@ -190,8 +190,22 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 ## 调参
 ### 关键参数说明
 参考[官方文档][0]，着重讲讲下面的几个参数。
-- max_depth，树的最大深度。太小了难以捕捉到数据中的模式，太大了容易过拟合。
+- max_depth，树的最大深度。太小了难以捕捉到数据中的模式，太大了容易过拟合。通常情况下是4-6.
 - learning_rate，也就是上面的$$\eta$$
-- n_estimators，
+- n_estimators，拟合数据所用的树的个数，这个是如何确定的还没搞明白
+- gamma，也就是上面的$$\mathcal{L}_{split}$$公式里的$$\gamma$$，只有当$$\mathcal{L}$$为正的时候才会在该节点处进一步分割
+- subsample，按这个比例收取样本来训练决策树
+- colsample_bytree，也就是上面提到的column subsampling，按这个比例选取特征训练决策树
+- colsample_bylevel，和上面的不同之处是每次分割前都会按这个比率抽取特征。通常情况下可以不用。
+- lambda, L2 regulation term on weights.用得也不多。
+- reg_alpha, L1 regulation term on weights.
+- min_child_weight(int)，Minimun sum of instance weight(hessain) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max_depth越大，这个参数也越大。
+- max_delta_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced.
+
+
+
 ---
 [0]: http://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn
+[1]: https://www.kaggle.com/c/santander-customer-satisfaction/discussion/20662
+[2]: https://github.com/dmlc/xgboost/blob/master/doc/parameter.md
+
