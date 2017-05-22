@@ -189,7 +189,7 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 
 ## 调参
 ### 关键参数说明
-参考[官方文档][0]，着重讲讲下面的几个参数。
+参考[官方的API文档][0]，着重讲讲下面的几个参数。
 - max_depth，树的最大深度。太小了难以捕捉到数据中的模式，太大了容易过拟合。通常情况下是4-6.
 - learning_rate，也就是上面的$$\eta$$
 - n_estimators，拟合数据所用的树的个数，这个是如何确定的还没搞明白
@@ -200,13 +200,28 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 - lambda, L2 regulation term on weights.用得也不多。
 - reg_alpha, L1 regulation term on weights.
 - min_child_weight(int)，Minimun sum of instance weight(hessain) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max_depth越大，这个参数也越大。在线性回归模型中，就对应着样本的数量。
-- max_delta_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced. 参考[官方文档][2]。
+- max_delta_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced. 参考[官方参数说明文档][2]。
 
+### 基本思路
+1. Choose a relatively high learning rate. Generally a learning rate of 0.1 works but somewhere between 0.05 to 0.3 should work for different problems. Determine the optimum number of trees for this learning rate. XGBoost has a very useful function called as “cv” which performs cross-validation at each boosting iteration and thus returns the optimum number of trees required.
+2. Tune tree-specific parameters ( max_depth, min_child_weight, gamma, subsample, colsample_bytree) for decided learning rate and number of trees. Note that we can choose different parameters to define a tree and I’ll take up an example here.
+3. Tune regularization parameters (lambda, alpha) for xgboost which can help reduce model complexity and enhance performance.
+4. Lower the learning rate and decide the optimal parameters .
 
+参考[Complete Guide to Parameter Tuning in XGBoost (with codes in Python)][4]
+
+## 参考文献
+1. [XGBoost: A Scalable Tree Boosting System(官方论文)][3]
+2. [Introduction to Boosted Trees][5]
+3. [xgboost python api的说明文档][0]
+4. [官方的参数说明文档][2]
+5. [Complete Guide to Parameter Tuning in XGBoost (with codes in Python)][4]
+6. [Overtuning hyper parameters (especially re xgboost)][1]
 
 ---
 [0]: http://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn
 [1]: https://www.kaggle.com/c/santander-customer-satisfaction/discussion/20662
 [2]: https://github.com/dmlc/xgboost/blob/master/doc/parameter.md
 [3]: https://arxiv.org/abs/1603.02754
-
+[4]: https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/
+[5]: https://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf
