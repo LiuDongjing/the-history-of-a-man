@@ -2,11 +2,7 @@
 
 ## 简介
 
-[XGBoost](https://github.com/dmlc/xgboost)\(e**X**treme **G**radient **Boost**ing\)是一个分布式  
-的gradient boosting库，当初的设计目标就是**高效**、**灵活**和**可移植**。  
-该库使用并行的tree boosting\(也即GBDT和GBM\)来快速、精确地解决许多数据科学  
-方面的问题。同样的代码可无需改变就能在主要的分布式环境\(Hadoop、SGE和MPI\)  
-下运行，并且可处理数十亿级别的数据量。
+[XGBoost](https://github.com/dmlc/xgboost)(e**X**treme **G**radient **Boost**ing)是一个分布式的gradient boosting库，当初的设计目标就是**高效**、**灵活**和**可移植**。该库使用并行的tree boosting(也即GBDT和GBM)来快速、精确地解决许多数据科学方面的问题。同样的代码可无需改变就能在主要的分布式环境(Hadoop、SGE和MPI)下运行，并且可处理数十亿级别的数据量。
 
 ## 整体流程与特点
 
@@ -16,7 +12,7 @@
 * 整体分为两个部分，求解目标函数和构建CART
 * 整个算法并没有涉及多少高深的数学知识，但给出的解决方法确实非常巧妙和优雅
 
-## CART\(Classfication And Regression Tree\)
+## CART(Classfication And Regression Tree)
 
 使用CART做预测的基本形式如下
 
@@ -26,7 +22,7 @@ $$\hat{y}_i = \phi(x_i) = \sum\limits_{k=1}^Kf_k(x_i), \quad f_k \in \mathcal{F}
 
 $$\mathcal{F} = \{f(x) = w_{q(x)}(q: \mathbb{R}^m \rightarrow T, w \in \mathbb{R}^T)\}$$
 
-这里$$x_i$$是一个m维的样本，f\(x\)将它映射成一个实数，具体映射方法是使用决策树将$$x_i$$映射成w\(实数向量，是决策树的叶子节点\)，然后再选择w中的某一维\(其中一个叶子节点\)作为f\(x\)的预测结果。q\(x\)函数就代表了决策树的结构。最终的预测结果是K个这样的决策树越策结果的累加和。
+这里$$x_i$$是一个m维的样本，f(x)将它映射成一个实数，具体映射方法是使用决策树将$$x_i$$映射成w(实数向量，是决策树的叶子节点)，然后再选择w中的某一维(其中一个叶子节点)作为f(x)的预测结果。q(x)函数就代表了决策树的结构。最终的预测结果是K个这样的决策树越策结果的累加和。
 
 **注意** 这里还存在两个未解决的问题，每颗树的w是如何取值的？一棵树是如何将样本映射到叶子节点的？
 
@@ -54,7 +50,7 @@ t-1次迭代的预测结果$$\hat{y_i}^{(t-1)}$$加上本次添加树的预测�
 
 ### 近似
 
-简化后的目标函数仍然不好求解。考虑到泰勒\(Taylor\)公式：
+简化后的目标函数仍然不好求解。考虑到泰勒(Taylor)公式：
 
 $$f(x + \Delta x) \simeq f(x) + f^{'}(x)\Delta x + \frac{1}{2}f^{''}(x)\Delta x^2$$
 
@@ -88,7 +84,7 @@ $$
 
 其实也就是转换了看问题的角度，开始是从样本的角度来看目标函数，现在转换成从叶子节点的角度来看。就像求二维矩阵所有元素的和一样，先求每一行的和再把结果相加与先求列的和再相加是一样的。
 
-当q\(x\)固定，也就是树的结构固定，影响损失函数的只有叶子的权重w，此时损失函数是关于w的一元二次函数，有最优解：
+当q(x)固定，也就是树的结构固定，影响损失函数的只有叶子的权重w，此时损失函数是关于w的一元二次函数，有最优解：
 
 $$w_j^* = -\frac{\sum_{i \in I_j} g_i}{\sum_{i \in I_j} h_i + \lambda}$$
 
@@ -103,27 +99,27 @@ $$\tilde{\mathcal{L}}^{(t)}(q) = -\frac{1}{2} \sum\limits_{j=1}^T \frac{(\sum_{i
 
 ### 基本思路
 
-通常情况下枚举所有可能的树结构是不现实的，一般采用贪心算法。最开始只有一个叶子节点，所有的样本都落在这个节点里，然后迭代地向里面添加分支。设I为原叶子节点里的样本集合，$$I_L$$和$$I_R$$分别是对I拆分后的样本集合，即$$I = I_L \cup I_R$$，那么可得到拆分前后损失函数的变化量\(拆分前减去拆分后\)：
+通常情况下枚举所有可能的树结构是不现实的，一般采用贪心算法。最开始只有一个叶子节点，所有的样本都落在这个节点里，然后迭代地向里面添加分支。设I为原叶子节点里的样本集合，$$I_L$$和$$I_R$$分别是对I拆分后的样本集合，即$$I = I_L \cup I_R$$，那么可得到拆分前后损失函数的变化量(拆分前减去拆分后)：
 
 $$\mathcal{L}_{split} = \frac{1}{2} \left[ \frac{(\sum_{i\in I_L} g_i)^2}{\sum_{i \in I_L} h_i + \lambda} + \frac{(\sum_{i\in I_R} g_i)^2}{\sum_{i \in I_R} h_i + \lambda} - \frac{(\sum_{i\in I} g_i)^2}{\sum_{i \in I} h_i + \lambda}\right] - \gamma$$
 
 这里就将损失函数和拆分操作联系起来了，当$$\mathcal{L}_{split}$$最大时，对该叶节点按选择的方式一分为二。
 
-### 算法1.0\(暴力枚举\)
+### 算法1.0(暴力枚举)
 
 **输入** I，当前节点的所有样本集合；D，特征的维度数
   
 $$G \leftarrow \sum_{i \in I}g_i, H \leftarrow \sum_{i \in I}h_i$$  
 
 for k=1 to D do 
+
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$ 
  
-    $$G_L \leftarrow 0, H_L \leftarrow 0$$ 
- 
-    for j in sorted\(I, by $$x_{k}$$\) do
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted(I, by $$x_{k}$$) do
   
-        $$G\_L \leftarrow G\_L + g\_j, H\_L \leftarrow H\_L + h\_j\  
-G\_R \leftarrow G - G\_L, H\_R \leftarrow H - H\_L\  
-score \leftarrow max\(score, \frac{G\_L^2}{H\_L + \lambda} + \frac{G\_R^2}{H\_R + \lambda} - \frac{G^2}{H + \lambda}\)$$
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow G_L + g_j, H_L \leftarrow H_L + h_j\\
+G_R \leftarrow G - G_L, H_R \leftarrow H - H_L\\
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{G^2}{H + \lambda})$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;end
 
@@ -140,44 +136,62 @@ for k = 1 to D do
 &nbsp;&nbsp;&nbsp;&nbsp;针对特征k按照百分位数给出若干个分割点$$S_k = \left\{s_{k1}, s_{k2}, \cdots, s_{kl} \right\}
 $$
 
+&nbsp;&nbsp;&nbsp;&nbsp;这种预先计算分割点的方式可以是针对每棵树的(global)，也可以针对每个节点(local)。
 
-    这种预先计算分割点的方式可以是针对每棵树的\(global\)，也可以针对每个节点\(local\)。  
 end
 
-for k = 1 to D do  
-    $$G_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} g_j\\
-H_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} h_j$$  
+for k = 1 to D do
+
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} g_j\\
+H_{kv} \leftarrow = \sum\nolimits_{j \in \{j | s_{k,v} \ge x_{jk} \gt s_{k, v-1}\}} h_j$$
+
 end
 
 后续操作和算法1.0一样，不过只在预计算的分割点处分割。
 
-**Note**: 思路也是很简单的，在建树之前\(global\)之前会提前计算好分割点$$S_k$$，后面剖分节点时，不用一个一个尝试，只需要在$$S_k$$指定的地方分割就好。这样就简化了计算。local方式是指在分割某个节点前计算一个$$S_k$$，针对该节点下的样本集，而不是所有的样本集，这样比global方式又准确了一点，所以一般使用local方式。
+**Note**: 思路也是很简单的，在建树之前(global)之前会提前计算好分割点$$S_k$$，后面剖分节点时，不用一个一个尝试，只需要在$$S_k$$指定的地方分割就好。这样就简化了计算。local方式是指在分割某个节点前计算一个$$S_k$$，针对该节点下的样本集，而不是所有的样本集，这样比global方式又准确了一点，所以一般使用local方式。
 
-### 算法3.0\(Sparsity-aware Split\)
+### 算法3.0(Sparsity-aware Split)
 
 **输入** I, 当前节点的所有样本；D，特征的维度  
-在使用算法2.0的设置时，只将非空的样本收入buckets。  
+
+在使用算法2.0的设置时，只将非空的样本收入buckets。
+  
 $$G \leftarrow \sum_{i \in I}g_i, H \leftarrow \sum_{i \in I}h_i$$  
+
 for k = 1 to D do  
-    $$I_k = \left\{ i \in I | x_{ik} \ne missing\right\}$$  
-    //将有数据缺失的样本归入右边的节点  
-    $$G_L \leftarrow 0, H_L \leftarrow 0$$  
-    for j in sorted\($$I_k$$, **ascent** order by $$x_k$$\) do  
-        $$G_L \leftarrow  G_L + g_i, H_L \leftarrow H_L + h_i\\
+
+&nbsp;&nbsp;&nbsp;&nbsp;$$I_k = \left\{ i \in I | x_{ik} \ne missing\right\}$$ 
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;//将有数据缺失的样本归入右边的节点
+  
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow 0, H_L \leftarrow 0$$
+
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted($$I_k$$, **ascent** order by $$x_k$$) do
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_L \leftarrow  G_L + g_i, H_L \leftarrow H_L + h_i\\
 G_R \leftarrow G - G_L, H_R \leftarrow H - H_L\\
-score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$  
-    end  
-    //将有数据缺失的样本归入左边的节点  
-    $$G_R \leftarrow 0, H_R \leftarrow 0$$  
-    for j in sorted\($$I_k$$, **descent** order by $$x_k$$\) do  
-        $$G_R \leftarrow  G_R + g_i, H_R \leftarrow H_R + h_i\\
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$
+
+&nbsp;&nbsp;&nbsp;&nbsp;end
+
+&nbsp;&nbsp;&nbsp;&nbsp;//将有数据缺失的样本归入左边的节点
+
+&nbsp;&nbsp;&nbsp;&nbsp;$$G_R \leftarrow 0, H_R \leftarrow 0$$
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;for j in sorted($$I_k$$, **descent** order by $$x_k$$) do
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$$G_R \leftarrow  G_R + g_i, H_R \leftarrow H_R + h_i\\
 G_L \leftarrow G - G_R, H_L \leftarrow H - H_R\\
-score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$  
-    end  
-end  
+score \leftarrow max(score, \frac{G_L^2}{H_L + \lambda} + \frac{G^2_R}{H_R + \lambda} - \frac{G^2}{H - \lambda})$$
+
+&nbsp;&nbsp;&nbsp;&nbsp;end
+
+end
+
 **输出** score最大时对应的分割
 
-**Note**: 算法3.0主要是为了解决在实际应用中经常出现的数据缺失的问题，为此xgboost提出了**default direction**的概念，也就是当在某一特征上分割样本而一些样本缺失该特征的数据时，则会被归入一个默认的子节点\(见下图\)。默认方向是在训练过程中得到的。算法的整体思路也很直观，针对每个特征，都会测试将不完整样本归入左边和右边这两种情况。注意这里的$$I_k$$是这对第k个特征来讲的，也就是说只要样本的第k个特征不为空，那么就会包含到$$I_k$$里，而不管其他特征是否为空。另外这个算法可以和算法2.0整合，只需要注意预先计算的分割点也是在$$I_k$$上进行的。
+**Note**: 算法3.0主要是为了解决在实际应用中经常出现的数据缺失的问题，为此xgboost提出了**default direction**的概念，也就是当在某一特征上分割样本而一些样本缺失该特征的数据时，则会被归入一个默认的子节点(见下图)。默认方向是在训练过程中得到的。算法的整体思路也很直观，针对每个特征，都会测试将不完整样本归入左边和右边这两种情况。注意这里的$$I_k$$是这对第k个特征来讲的，也就是说只要样本的第k个特征不为空，那么就会包含到$$I_k$$里，而不管其他特征是否为空。另外这个算法可以和算法2.0整合，只需要注意预先计算的分割点也是在$$I_k$$上进行的。
 
 ![default direction](images/default_direction.JPG)
 
@@ -197,7 +211,7 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 
 ### Column block
 
-将数据按列组织\(如下图\)，训练之前会把每列按序排好。因为训练的时候只需要每个样本的g和h值，所以每一个元素会有指向g和h的指针。
+将数据按列组织(如下图)，训练之前会把每列按序排好。因为训练的时候只需要每个样本的g和h值，所以每一个元素会有指向g和h的指针。
 
 ![column block](images/column_block.JPG)
 
@@ -220,26 +234,26 @@ Column subsampling也即是在每次只选取特征集合的一个子集来做�
 * colsample\_bylevel，和上面的不同之处是每次分割前都会按这个比率抽取特征。通常情况下可以不用。
 * lambda, L2 regulation term on weights.用得也不多。
 * reg\_alpha, L1 regulation term on weights.
-* min\_child\_weight\(int\)，Minimun sum of instance weight\(hessain\) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max\_depth越大，这个参数也越大。在线性回归模型中，就对应着样本的数量。
-* max\_delta\_step\(int\), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced. 参考[官方参数说明文档](https://github.com/dmlc/xgboost/blob/master/doc/parameter.md)。
+* min\_child\_weight(int)，Minimun sum of instance weight(hessain) needed in a child。没搞懂为什么这样定义，不过资料上说可以防止过拟合，控制了每个叶子节点样本的数量。这个参数受总样本数量的影响。通常max\_depth越大，这个参数也越大。在线性回归模型中，就对应着样本的数量。
+* max\_delta\_step(int), maximum delta step we allow each tree's weight estimation to be. Usually this parameter is not needed, but it might help in logistic regression when class is extremely imbalanced. 参考[官方参数说明文档](https://github.com/dmlc/xgboost/blob/master/doc/parameter.md)。
 
 ### 基本思路
 
 1. Choose a relatively high learning rate. Generally a learning rate of 0.1 works but somewhere between 0.05 to 0.3 should work for different problems. Determine the optimum number of trees for this learning rate. XGBoost has a very useful function called as “cv” which performs cross-validation at each boosting iteration and thus returns the optimum number of trees required.
-2. Tune tree-specific parameters \( max\_depth, min\_child\_weight, gamma, subsample, colsample\_bytree\) for decided learning rate and number of trees. Note that we can choose different parameters to define a tree and I’ll take up an example here.
-3. Tune regularization parameters \(lambda, alpha\) for xgboost which can help reduce model complexity and enhance performance.
+2. Tune tree-specific parameters ( max\_depth, min\_child\_weight, gamma, subsample, colsample\_bytree) for decided learning rate and number of trees. Note that we can choose different parameters to define a tree and I’ll take up an example here.
+3. Tune regularization parameters (lambda, alpha) for xgboost which can help reduce model complexity and enhance performance.
 4. Lower the learning rate and decide the optimal parameters .
 
-参考[Complete Guide to Parameter Tuning in XGBoost \(with codes in Python\)](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
+参考[Complete Guide to Parameter Tuning in XGBoost (with codes in Python)](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
 
 ## 参考文献
 
-1. [XGBoost: A Scalable Tree Boosting System\(官方论文\)](https://arxiv.org/abs/1603.02754)
+1. [XGBoost: A Scalable Tree Boosting System(官方论文)](https://arxiv.org/abs/1603.02754)
 2. [Introduction to Boosted Trees](https://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf)
 3. [xgboost python api的说明文档](http://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn)
 4. [官方的参数说明文档](https://github.com/dmlc/xgboost/blob/master/doc/parameter.md)
-5. [Complete Guide to Parameter Tuning in XGBoost \(with codes in Python\)](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
-6. [Overtuning hyper parameters \(especially re xgboost\)](https://www.kaggle.com/c/santander-customer-satisfaction/discussion/20662)
+5. [Complete Guide to Parameter Tuning in XGBoost (with codes in Python)](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
+6. [Overtuning hyper parameters (especially re xgboost)](https://www.kaggle.com/c/santander-customer-satisfaction/discussion/20662)
 
 ---
 
