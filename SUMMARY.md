@@ -8,7 +8,9 @@
   * [XGBoost基础](机器学习/xgboost基础.md)
 * [计科专业](计科专业/README.md)
   * [python coding style](计科专业/python_style.md)
+  * [leetcode解题思路](其他/leetcode.md)
   * [投影变换矩阵](计科专业/图形学-投影变换矩阵.md)
+  * [QT Installer Framework tutorial](其他/QT_IFW.md)
 * [随笔](随笔/README.md)
   * [乌镇旅游](随笔/乌镇.md)
   * [西溪湿地](随笔/西溪湿地.md)
@@ -16,5 +18,4 @@
   * [17年春季毅行](随笔/17年春季毅行.md)
   * [120年校庆](随笔/120校庆.md)
 * [其他](其他/README.md)
-  * [QT Installer Framework tutorial](其他/QT_IFW.md)
-  * [leetcode解题思路](其他/leetcode.md)
+
