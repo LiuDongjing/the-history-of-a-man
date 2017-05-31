@@ -32,6 +32,15 @@ for line in afile: ...
 for k, v in dict.iteritems(): ...
 ```
 
+## lambda函数
+代码量不超过60个字符，可以使用lambda函数。否则，使用一般(嵌套)的函数。
+
+## 条件表达式
+一行可以写完的话，就可以用这种方式，否则就老老实实用if语句。比如：
+
+```python
+x = 1 if cond else 2
+```
 
 [0]: https://www.pylint.org/
 [1]: https://www.python.org/dev/peps/pep-0008/
