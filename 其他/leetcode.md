@@ -282,8 +282,39 @@ public:
         return index;
     }
 };
+
+## 53(Maximum Subarray)
+### 问题重述
+给一个整数数组A，找出它的连续子数组的最大和，即$$max \sum_{i=k}^n A[i], 0 \le k \le n \lt len(A)$$。
+
+### 思路
+动态规划的方法。设S[k]是以A[k]结尾的连续子数组的最大和。那么有
+
+$$S[k] = \begin{case}
+S[0] = A[0]&
+S[k] = S[k-1] + A[k] if S[k-1] \gt 0
+S[k] = A[k] else
+\end{case}$$
+
+最后，找出S[k]中的最大值即可。
+
+### 代码
+```cpp
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        if(nums.size() <= 1) return nums[0];
+        vector<int> tmp = nums;
+        for(int i = 1; i < tmp.size(); i++) {
+            if(tmp[i-1] <= 0) continue;
+            tmp[i] += tmp[i-1];
+        }
+        return *max_element(tmp.begin(), tmp.end());
+    }
+};
 ```
 
+---
 [0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
 [1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
 [2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
