@@ -23,7 +23,7 @@
 但已知它的数值以及排在它前面比它大(或者等于)的数字的个数，通过这些已知信息求出原来
 的序列q。
 
-输入$$r = \{<x_1, c_1>, <x_2, c_2>, ..., <x_n, c_n>\}$$，$$x_n$$是q中的数字，$$c_n$$是在$$x_n$$前面并且比它大的数字的个数。求出q。
+输入$$r = \{(x_1, c_1), (x_2, c_2), ..., (x_n, c_n)\}$$，$$x_n$$是q中的数字，$$c_n$$是在$$x_n$$前面并且比它大的数字的个数。求出q。
 
 ### 思路
 最开始有n个空位置，每次从剩余的数字中挑出最小的给它安排位置。因为每个空位
@@ -97,7 +97,7 @@ public:
 ### 问题重述
 给一个序列，问满足下面条件的最长子序列(和上面的子字符串的定义一样，通过删除某些数字得到)的长度是多少？
 
-对子序列中的每个数字$$q_i$$，满足##(q_i - q_{i-1})\time(q_{i+1} - q_i) < 0$$，也就是将序列画在坐标系上呈锯齿状。
+对子序列中的每个数字$$q_i$$，满足$$(q_i - q_{i-1}) \time (q_{i+1} - q_i) < 0$$，也就是将序列画在坐标系上呈锯齿状。
 
 ### 思路
 对于每一段连续上升(或下降)的子序列，中间的数字是不用包含在最终的子序列里面的，因为假设存在一个中间点的最长子序列，
@@ -313,18 +313,3 @@ public:
     }
 };
 ```
-
----
-[0]: https://chart.googleapis.com/chart?cht=tx&chl=P_i
-[1]: https://chart.googleapis.com/chart?cht=tx&chl=C_i
-[2]: https://chart.googleapis.com/chart?cht=tx&chl=(q_i%20-%20q_%7Bi-1%7D)%5Ctime(q_%7Bi%2B1%7D%20-%20q_i)%20%3C%200
-[3]: https://chart.googleapis.com/chart?cht=tx&chl=q_i
-[4]: https://chart.googleapis.com/chart?cht=tx&chl=%5Capprox%2050%2C000
-[5]: https://chart.googleapis.com/chart?cht=tx&chl=q%20%3D%20%5C%7Ba_1%2C%20%20a_2%2C%20%20...%20%2C%20%20a_n%5C%7D
-[6]: https://chart.googleapis.com/chart?cht=tx&chl=a_n
-[7]: https://chart.googleapis.com/chart?cht=tx&chl=x_n
-[8]: https://chart.googleapis.com/chart?cht=tx&chl=c_n
-[9]: https://chart.googleapis.com/chart?cht=tx&chl=r%20%3D%20%5C%7B%3Cx_1%2C%20c_1%3E%2C%20%3Cx_2%2C%20c_2%3E%2C%20...%2C%20%3Cx_n%2C%20c_n%3E%5C%7D
-[10]: images/435_NonOverlapping_greedy1.JPG
-[11]: https://chart.googleapis.com/chart?cht=tx&chl=O(2%5En)
-[12]: https://chart.googleapis.com/chart?cht=tx&chl=O(n%5E2)
