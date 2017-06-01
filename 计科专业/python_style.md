@@ -42,6 +42,47 @@ for k, v in dict.iteritems(): ...
 x = 1 if cond else 2
 ```
 
+## 默认参数
+默认参数指在module加载的时候计算一次，所有不要使用list和dict等可变的数据作为默认值，否则在程序运行过程中，如果某段代码改变了默认值(比如在list末尾添加元素)，那么后续的代码使用的就是改变之后的默认值。
+```python
+No:  def foo(a, b=[]):
+         ...
+No:  def foo(a, b=time.time()):  # The time the module was loaded???
+         ...
+No:  def foo(a, b=FLAGS.my_thing):  # sys.argv has not yet been parsed...
+```
+
+## 属性
+在设计类的时候，使用属性来保存、获取、修改数据，而不要accessor和setter方法。只读属性用@property装饰器。
+
+## True/False判断
+尽量使用隐式的False，在判断布尔值的时候，0、None、[]、{}和''都会判为False。有下面几条规则需要注意：
+- 不要用==和!=来比较对象，应当使用is和is not
+- 当你想表达if x is not None时，不要使用if x，因为x可能是[]或者{}，此时if x都不会通过
+- 不要用==比较布尔变量和False，应当用if not x
+- 当需要把False和None分开的时候，请用if not x and x is not None(只有False能通过这个判断)
+- 判断string、dict、list、tuple等，记住数据为空是False，所以推荐用if not seq和if seq来代替if len(seq)和if not len(seq)
+- 处理整数类型的数据时，应避免使用隐式的False，参考下面给的例子。
+    ```python
+    Yes: if not users:
+         print 'no users'
+
+     if foo == 0:
+         self.handle_zero()
+
+     if i % 10 == 0:
+         self.handle_multiple_of_ten()
+
+     No:  if len(users) == 0:
+         print 'no users'
+
+     if foo is not None and not foo:
+         self.handle_zero()
+
+     if not i % 10:
+         self.handle_multiple_of_ten()
+    ```
+
 [0]: https://www.pylint.org/
 [1]: https://www.python.org/dev/peps/pep-0008/
 [2]: https://google.github.io/styleguide/pyguide.html
