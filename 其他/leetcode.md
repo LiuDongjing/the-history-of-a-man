@@ -1,4 +1,6 @@
 # leetcode解题思路
+> 讲述思路尽量不适用公式和图片，用类似与人当面交流的语言陈述出来就行了
+
 ## 435(Non overlapping Intervals)
 ### Brute Force
 将Intervals按start point从小到大排序，然后从左到右处理Interval，
@@ -282,6 +284,7 @@ public:
         return index;
     }
 };
+```
 
 ## 53(Maximum Subarray)
 ### 问题重述
