@@ -293,11 +293,11 @@ public:
 ### 思路
 动态规划的方法。设S[k]是以A[k]结尾的连续子数组的最大和。那么有
 
-$$S[k] = \begin{case}
+$$S[k] = \begin{cases}
 S[0] = A[0]&
 S[k] = S[k-1] + A[k] if S[k-1] \gt 0
 S[k] = A[k] else
-\end{case}$$
+\end{cases}$$
 
 最后，找出S[k]中的最大值即可。
 
