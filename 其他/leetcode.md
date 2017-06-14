@@ -316,3 +316,8 @@ public:
     }
 };
 ```
+
+## 516(Longest Palindromic Subsequence)
+### 问题重述
+给一个字符串，计算它最长回文子串的长度。
+### 思路
