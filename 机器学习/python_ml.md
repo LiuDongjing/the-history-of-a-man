@@ -203,7 +203,7 @@ DataFrame有三种基本的selection方法。
 
 - .loc，基于label的selection，比如使用列名，行索引
 - .iloc，基于位置的selection，序号从0开始
-- .ix，前两者的混合.
+- .ix，前两者的混合(已经废除了，[官方说明](http://pandas.pydata.org/pandas-docs/stable/indexing.html#ix-indexer-is-deprecated)).
     ```python
     x.ix[0:2,'b':'c']
     ```
