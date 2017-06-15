@@ -59,7 +59,7 @@ public:
             }
         }
         vector<pair<int, int>> ret(people.size());
-        //恢复原始顺序 
+        //恢复原始顺序
         for(int i = 0;i < ret.size(); i++) {
             ret[i] = people[index[i]];
         }
@@ -135,7 +135,7 @@ public:
 ## 502(IPO)*
 ### 问题重述
 有一系列项目，每个项目有两个属性$$P_i$$(完成项目获得的利润)和$$C_i$$(启动这个项目最低要有多少资金，
-**注意**并不是需要花费这么多资金，而是一个资格，你的资金大于等于$$C_i$$就有资格启动这个项目)。
+**注意** 并不是需要花费这么多资金，而是一个资格，你的资金大于等于$$C_i$$就有资格启动这个项目)。
 现在你的初始资金是W，问在最多选择k个项目的限制下，怎样选择项目才能使获得的最终资金最多？
 
 ### 思路
@@ -149,7 +149,7 @@ public:
     static bool ab(pair<int,int> &a, pair<int,int> &b) {
         return a.second > b.second;
     }
-    int findMaximizedCapital(int k, int W, vector<int>& Profits, 
+    int findMaximizedCapital(int k, int W, vector<int>& Profits,
                 vector<int>& Capital) {
         vector<pair<int,int>> pc;
         for(int i = 0; i < Profits.size(); i++)
@@ -312,7 +312,7 @@ public:
             if(tmp[i-1] <= 0) continue;
             tmp[i] += tmp[i-1];
         }
-        return *max_element(tmp.begin(), tmp.end());
+        return * max_element(tmp.begin(), tmp.end());
     }
 };
 ```
