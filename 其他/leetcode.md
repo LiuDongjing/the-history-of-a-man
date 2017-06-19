@@ -294,9 +294,9 @@ public:
 动态规划的方法。设S[k]是以A[k]结尾的连续子数组的最大和。那么有
 
 $$S[k] = \begin{cases}
-S[0] = A[0]&
-S[k] = S[k-1] + A[k] if S[k-1] \gt 0
-S[k] = A[k] else
+S[0] = A[0]\\
+S[k] = S[k-1] + A[k], if S[k-1] \gt 0\\
+S[k] = A[k], else
 \end{cases}$$
 
 最后，找出S[k]中的最大值即可。
@@ -319,5 +319,79 @@ public:
 
 ## 516(Longest Palindromic Subsequence)
 ### 问题重述
-给一个字符串，计算它最长回文子串的长度。
+给一个字符串，计算它最长回文子串的长度(简称LPS)。
+
 ### 思路
+$$f(S, i, j) = \begin{cases}
+0,\quad if\quad i > j \\
+1,\quad if\quad i == j \\
+f(S, i+1, j-1) + 2,\quad if\quad S[i] == S[j]\\
+max(f(S, i+1, j),\quad f(S, i, j-1)),\quad else
+\end{cases}
+$$
+
+LPS(S) = f(S, 0, n-1)。注意在实现的过程中并没有使用递归，而是从f(S, n-1, n-1), f(S, n-2, n-2), f(S, n-2, n-1), ..., f(S, 0, n-1)这个顺序计算，只需要两个数组就能实现。
+
+### 代码
+```cpp
+class Solution {
+public:
+    int longestPalindromeSubseq(string s) {
+        //DP用于保存相邻两行的中间结果
+        vector<int> * prev = new vector<int>(s.size(), 0),
+                * next = new vector<int>(s.size(), 0);
+        for(int i = s.size()-1; i >= 0; i--) {
+            for(int j = 0; j < s.size(); j++) {
+                if(j < i) (* next)[j] = 0;
+                else if(i == j) (* next)[j] = 1;
+                else if(s[i] == s[j]) (* next)[j] = 2 + (* prev)[j-1];
+                else (* next)[j] = max((* prev)[j], (* next)[j-1]);
+            }
+            swap(prev, next);
+        }
+        int r = (* next).back();
+        delete prev;
+        delete next;
+        return r;
+    }
+};
+```
+
+```cpp
+class Solution {
+public:
+    int longestPalindromeSubseq(string s) {
+        if(s.size() <= 1) return s.size();
+        vector<int> res;
+        //DP用于保存相邻两行的中间结果
+        vector<int> * prev = new vector<int>(s.size(), 0),
+                * next = new vector<int>(s.size(), 0);
+        if(s[0] == s.back()) (* prev)[0] = 2+(s.size() > 2);
+        else (* prev)[0] = 1;
+        for(int i = 1; i < s.size() - 1; i++)
+        {
+            if(s[i] == s.back()) (* prev)[i] = 2 + (i < (s.size()-2));
+            else (* prev)[i] = 1;
+            (* prev)[i] = max((* prev)[i], (* prev)[i-1]);
+        }
+        res.push_back((* prev)[s.size()-2]);
+        for(int r = s.size()-2; r > 0;r--){
+            (* next)[0] = (* prev)[0];
+            if(s[0] == s[r]) (* next)[0] = 2+(r>1);
+            for(int j = 1; j < r; j++) {
+                int tmp = (* prev)[j-1];
+                if(s[r] == s[j]) {
+                    if(tmp % 2 && (r-j <= 1)) tmp+=1;
+                    else tmp+=2;
+                }
+                (* next)[j] = max(tmp, max((* prev)[j], (* next)[j-1]));
+            }
+            res.push_back((* next)[r-1]);
+            swap(prev, next);
+        }
+        delete prev;
+        delete next;
+        return * max_element(res.begin(), res.end());
+    }
+};
+```
