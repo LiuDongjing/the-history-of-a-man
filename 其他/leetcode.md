@@ -330,7 +330,9 @@ max(f(S, i+1, j),\quad f(S, i, j-1)),\quad else
 \end{cases}
 $$
 
-LPS(S) = f(S, 0, n-1)。注意在实现的过程中并没有使用递归，而是从f(S, n-1, n-1), f(S, n-2, n-2), f(S, n-2, n-1), ..., f(S, 0, n-1)这个顺序计算，只需要两个数组就能实现。
+这里第三个计算要说一下，f(S, i+1, j-1)+2一定是大于f(S, i, j-1)和f(S, i+1, j)的，所以就没有max的操作。以f(S, i, j-1)为例，如果f(S, i+1, j-1)的计算不包含s[j-1]，那么f(S, i, j-1)最大可能值是f(S, i+1, j-1)+2；如果包含s[j-1]，那f(S, i, j-1)和f(s, i+1, j-1)是相等的。
+
+LPS(S) = f(S, 0, n-1)。注意在实现的过程中并没有使用递归，而是从f(S, n-1, n-1), f(S, n-2, n-2), f(S, n-2, n-1), ..., f(S, 0, n-1)这个顺序计算，只需要两个数组就能实现。这种递归计算是局部依赖的，并且有方向性，所以可以从初值计算到目标值。
 
 ### 代码
 ```cpp
@@ -349,49 +351,11 @@ public:
             }
             swap(prev, next);
         }
-        int r = (* next).back();
+        //注意上面swap过了
+        int r = (* prev).back();
         delete prev;
         delete next;
         return r;
-    }
-};
-```
-
-```cpp
-class Solution {
-public:
-    int longestPalindromeSubseq(string s) {
-        if(s.size() <= 1) return s.size();
-        vector<int> res;
-        //DP用于保存相邻两行的中间结果
-        vector<int> * prev = new vector<int>(s.size(), 0),
-                * next = new vector<int>(s.size(), 0);
-        if(s[0] == s.back()) (* prev)[0] = 2+(s.size() > 2);
-        else (* prev)[0] = 1;
-        for(int i = 1; i < s.size() - 1; i++)
-        {
-            if(s[i] == s.back()) (* prev)[i] = 2 + (i < (s.size()-2));
-            else (* prev)[i] = 1;
-            (* prev)[i] = max((* prev)[i], (* prev)[i-1]);
-        }
-        res.push_back((* prev)[s.size()-2]);
-        for(int r = s.size()-2; r > 0;r--){
-            (* next)[0] = (* prev)[0];
-            if(s[0] == s[r]) (* next)[0] = 2+(r>1);
-            for(int j = 1; j < r; j++) {
-                int tmp = (* prev)[j-1];
-                if(s[r] == s[j]) {
-                    if(tmp % 2 && (r-j <= 1)) tmp+=1;
-                    else tmp+=2;
-                }
-                (* next)[j] = max(tmp, max((* prev)[j], (* next)[j-1]));
-            }
-            res.push_back((* next)[r-1]);
-            swap(prev, next);
-        }
-        delete prev;
-        delete next;
-        return * max_element(res.begin(), res.end());
     }
 };
 ```
