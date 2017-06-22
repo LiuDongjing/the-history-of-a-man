@@ -359,3 +359,28 @@ public:
     }
 };
 ```
+
+## 338(Counting Bits)
+### 问题重述
+给一个整数num，计算从0到num内每个二进制整数中1的个数。
+
+### 思路
+基本的方法很简单，不过leetcode上说有个$O(n)$的方法，一遍都可以计算出来，而且不需要借助统计二进制整数中1的个数的函数。思考这个方法，还是花了一点时间。想出来了，其实很简单，除了0之外，每个二进制整数的最高位一定是1，它的1位个数等于1加上去掉最高位剩下的数的1位个数。实现起来也很简单。
+
+### 代码
+```cpp
+class Solution {
+public:
+    vector<int> countBits(int num) {
+        vector<int> res(num+1, 0);
+        if(num < 1) return res;
+        res[1] = 1;
+        for(int i = 2; i <= num;i++) {
+            int n = floor(log2(i));
+            int prev = 1 << n;
+            res[i] = res[i-prev]+1;
+        }
+        return res;
+    }
+};
+```
