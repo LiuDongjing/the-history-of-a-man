@@ -594,3 +594,136 @@ exports.method = function(foo) {
   return 5;
 };
 ```
+
+file-level注释，使用@fileoverview，描述一下文件的内容和依赖信息。换行后不需要缩进。
+
+类的注释
+```javascript
+/**
+ * A fancier event target that does cool things.
+ * @implements {Iterable<string>}
+ */
+class MyFancyTarget extends EventTarget {
+  /**
+   * @param {string} arg1 An argument that makes this more interesting.
+   * @param {!Array<number>} arg2 List of numbers to be processed.
+   */
+  constructor(arg1, arg2) {
+    // ...
+  }
+};
+
+/**
+ * Records are also helpful.
+ * @extends {Iterator<TYPE>}
+ * @record
+ * @template TYPE
+ */
+class Listable {
+  /** @return {TYPE} The next item in line to be returned. */
+  next() {}
+}
+```
+
+enum和typedef注释
+```javascript
+/**
+ * A useful type union, which is reused often.
+ * @typedef {!Bandersnatch|!BandersnatchType}
+ */
+let CoolUnionType;
+
+
+/**
+ * Types of bandersnatches.
+ * @enum {string}
+ */
+const BandersnatchType = {
+  /** This kind is really frumious. */
+  FRUMIOUS: 'frumious',
+  /** The less-frumious kind. */
+  MANXOME: 'manxome',
+};
+```
+
+函数和方法注释，参数和返回值的类型都要注明(足够简单的话，可以省略)。重载的方法应使用@override，省略参数和返回值的描述。
+```javascript
+/** This is a class. */
+class SomeClass extends SomeBaseClass {
+  /**
+   * Operates on an instance of MyClass and returns something.
+   * @param {!MyClass} obj An object that for some reason needs detailed
+   *     explanation that spans multiple lines.
+   * @param {!OtherClass} obviousOtherClass
+   * @return {boolean} Whether something occurred.
+   */
+  someMethod(obj, obviousOtherClass) { ... }
+
+  /** @override */
+  overriddenMethod(param) { ... }
+}
+
+/**
+ * Demonstrates how top-level functions follow the same rules.  This one
+ * makes an array.
+ * @param {TYPE} arg
+ * @return {!Array<TYPE>}
+ * @template TYPE
+ */
+function makeArray(arg) { ... }
+```
+
+匿名函数可以添加行内注释。
+```javascript
+promise.then(
+    (/** !Array<number|string> */ items) => {
+      doSomethingWith(items);
+      return /** @type {string} */ (items[0]);
+    });
+```
+
+属性注释，private属性如果容易理解，可不添加注释。Public exporter常量和属性一样需要注释。如果很容易就可以知道常量的类型，就不需要给它添加类型的annotation。
+```javascript
+/** My class. */
+class MyClass {
+  /** @param {string=} someString */
+  constructor(someString = 'default string') {
+    /** @private @const */
+    this.someString_ = someString;
+
+    /** @private @const {!OtherType} */
+    this.someOtherThing_ = functionThatReturnsAThing();
+
+    /**
+     * Maximum number of things per pane.
+     * @type {number}
+     */
+    this.someProperty = 4;
+  }
+}
+
+/**
+ * The number of times we'll try before giving up.
+ * @const
+ */
+MyClass.RETRY_COUNT = 33;
+```
+### Type annotation
+Type annotation，对@param, @return, @this, @type来说是必须的，对@const和@export是可选的。Type annotation放在大括号里面。
+
+"!"和"?"分别表示不为null和可以是null。
+Primitive types(undefined, string, number, boolean, symbol, function(...):...)和record({foo:string, bar:number})默认是不能为null的，不需要再这些类型前面添加"!"。对象类型(Array, Element, MyClass等)默认是可以为null的。除了primitive和record以外，其他类型都要显式表明"!"和"?"。
+
+模板的参数类型应当标清楚，如下：
+```javascript
+const /** !Object<string, !User> */ users = {};
+const /** !Array<string> */ books = [];
+const /** !Promise<!Response> */ response = ...;
+
+const /** !Promise<undefined> */ thisPromiseReturnsNothingButParameterIsStillUseful = ...;
+const /** !Object<string, *> */ mapOfEverything = {};
+```
+
+可见性的标签，@private, @package, @protected，局部变量不应使用这些标签。
+
+其他的一些标签，@author(不推荐使用), @see Link, 更多参考[JSDoc tags](https://google.github.io/styleguide/jsguide.html#appendices-documentation-annotations)。
