@@ -1,8 +1,8 @@
 # 常用软件下载
 
 ## 日常办公
-1. [Shadowsocks Windows](software/Shadowsocks-4.0.10.zip)
-2. [Shadowsocks Android](software/shadowsocks--universal-4.5.7.apk)
+1. [Shadowsocks Windows](https:/liudongjing.vip/software/Shadowsocks-4.0.10.zip)
+2. [Shadowsocks Android](https:/liudongjing.vip/software/shadowsocks--universal-4.5.7.apk)
 3. Windows远程控制[TeamViewer](https://www.teamviewer.us/downloads/)
 4. Linux 远程控制[SmarTTY](http://smartty.sysprogs.com/download/)
 5. 录屏软件[ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
